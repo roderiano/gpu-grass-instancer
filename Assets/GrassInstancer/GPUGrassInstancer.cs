@@ -14,7 +14,7 @@ public class GPUGrassInstancer : MonoBehaviour {
 
     GraphicsBuffer commandBuf;
     GraphicsBuffer.IndirectDrawIndexedArgs[] commandData;
-    const int commandCount = 11;
+    const int commandCount = 1;
 
     void Start()
     {
@@ -33,23 +33,18 @@ public class GPUGrassInstancer : MonoBehaviour {
         RenderParams renderParams = new RenderParams(material);
         renderParams.worldBounds = new Bounds(Vector3.zero, 10000*Vector3.one); // use tighter bounds for better FOV culling
         renderParams.matProps = new MaterialPropertyBlock();
-       
 
-        List<Vector3> terrainVert = new List<Vector3>();
-        meshFilter.mesh.GetVertices(terrainVert);
-
-        foreach (Vector3 vert in terrainVert.ToArray())
+        foreach (Vector3 vert in meshFilter.mesh.vertices)
         {
-            Vector3 newPos = vert + transform.position;
-            renderParams.matProps.SetMatrix("_ObjectToWorld", Matrix4x4.TRS(newPos, transform.rotation, Vector3.one));
+            renderParams.matProps.SetMatrix("_ObjectToWorld", Matrix4x4.Translate(transform.position + vert));
             for (int i = 0; i < commandCount; i++)
             {
                 commandData[i].indexCountPerInstance = mesh.GetIndexCount(0);
                 commandData[i].instanceCount = commandCount;
             }
-        }
 
-        commandBuf.SetData(commandData);
-        Graphics.RenderMeshIndirect(renderParams, mesh, commandBuf, commandCount);
+            commandBuf.SetData(commandData);
+            Graphics.RenderMeshIndirect(renderParams, mesh, commandBuf, commandCount);
+        }
     }
 }

@@ -25,7 +25,7 @@ Shader "Custom/GPUGrassInstancer"
                 InitIndirectDrawArgs(0);
                 uint cmdID = GetCommandID(0);
                 uint instanceID = GetIndirectInstanceID(svInstanceID);
-
+                
                 v2f o;
                 float4 wpos = mul(_ObjectToWorld, v.vertex + float4(instanceID, 0, cmdID, 0));
                 o.pos = mul(UNITY_MATRIX_VP, wpos);
